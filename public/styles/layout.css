@@ -1,0 +1,52 @@
+main {
+    height: calc(100vh - 52px);
+    background: whitesmoke;
+    display: flex;
+}
+
+.main-content-container-wrap {
+    height: 100%;
+    overflow: auto;
+    flex: 1;
+}
+
+.main-content-container {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 52px);
+}
+
+.main-content-container .main-content {
+    min-height: calc(100vh - 100px);
+    padding: .5rem 2rem;
+}
+
+.panel-block {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: scroll;
+}
+
+footer{
+    height: 48px;
+    color: gray;
+    text-align: center;
+}
+
+.side-content {
+    width: 240px;
+    background: white;
+    box-shadow: 1px 0 3px rgba(0, 0, 0, 0.3);
+}
+
+.navbar-brand {
+    width: 240px;
+}
+.navbar-item .version {
+    color: lightgray;
+    font-size: 8px;
+}
+.panel {
+    border-radius: 0;
+    margin-bottom: 0 !important;
+}

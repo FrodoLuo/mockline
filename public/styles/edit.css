@@ -1,0 +1,78 @@
+.title code{
+    font-family: monospace;
+}
+.edit-cards-container {
+    margin: 24px 0;
+}
+
+#data-digram {
+    min-height: 400px;
+}
+
+.data-node {
+    text-align: center;
+    box-sizing: border-box;
+    padding: 5px;
+    margin: 0 30px;
+    background-color: hsl(171, 100%, 41%);
+    border-radius: 5px;
+}
+.data-gaping {
+    text-align: center;
+}
+.data-gaping::after, .data-gaping::before {
+    background: black;
+    height: 15px;
+    width: 1px;
+    content: ' ';
+    display: block;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+.spin-btn-container {
+    position: fixed;
+    right: 2rem;
+    bottom: 100px;
+}
+
+label.checkbox {
+    margin-right: 10px;
+}
+
+.field-wrap {
+    margin: 20px 0;
+}
+.field .inputing {
+    padding-left: 48px;
+}
+.field .input-wrap {
+    position: relative;
+}
+.field .input-wrap .prefix {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: monospace;
+    border-right: 1px solid lightgray;
+}
+textarea.data-field {
+    font-family: monospace;
+}
+.hint {
+    font-weight: bold;
+}
+.field-action {
+    margin: 10px 0;
+    display: flex;
+}
+.field-action .input {
+    margin-left: 10px;
+    width: 240px;
+}

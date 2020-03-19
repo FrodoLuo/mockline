@@ -1,0 +1,387 @@
+<link rel="stylesheet" href="/public/styles/edit.css" />
+
+<div class="card">
+    <div class="card-header">
+        <p class="title card-header-title">
+            {{#if path}}
+            Sequence <a target="_blank" href="{{path}}"><code>{{path}}</code></a>
+            {{else}}
+            Sequence Create
+            {{/if}}
+        </p>
+    </div>
+</div>
+<div class="columns">
+
+    <div class="column is-four-fifths">
+        {{#if path}}
+        <div class="edit-cards-container">
+            <div class="card">
+                <div class="card-header">
+                    <p class="card-header-title">Action</p>
+                </div>
+                <div class="card-content">
+                    <button class="button" onclick="controller.resetInstance()">Reset Sequence Instance</button>
+                </div>
+            </div>
+        </div>
+        {{/if}}
+        <div class="edit-cards-container">
+            <div class="card">
+                <div class="card-header">
+                    <p class="card-header-title">Sequence Config</p>
+                </div>
+                <div class="card-content">
+                    <div class="field">
+                        <label class="label">Path</label>
+                        {{# if path}}
+                        <input class="input model" name="path" disabled />
+                        {{else}}
+                        <div class="input-wrap">
+                            <input class="input model inputing" name="path" />
+                            <div class="prefix">/api</div>
+                        </div>
+                        {{/if}}
+                    </div>
+                    <div class="columns">
+                        <div class="field column is-three-quarter">
+                            <label class="label">Allowed Method</label>
+                            <div class="container" disabled title="COMING SOON">
+                                <label class="checkbox" disabled>
+                                    <input type="checkbox" disabled />
+                                    GET
+                                </label>
+                                <label class="checkbox" disabled>
+                                    <input type="checkbox" disabled />
+                                    POST
+                                </label>
+                                <label class="checkbox" disabled>
+                                    <input type="checkbox" disabled />
+                                    PUT
+                                </label>
+                                <label class="checkbox" disabled>
+                                    <input type="checkbox" disabled />
+                                    DELETE
+                                </label>
+                                <label class="checkbox" disabled>
+                                    <input type="checkbox" disabled />
+                                    PATCH
+                                </label>
+                                <label class="checkbox" disabled>
+                                    <input type="checkbox" disabled />
+                                    HEAD
+                                </label>
+                                <label class="checkbox" disabled>
+                                    <input type="checkbox" disabled />
+                                    OPTION
+                                </label>
+                            </div>
+                        </div>
+                        <div class="field column is-one-quarter">
+                            <label class="label">Sequence Type</label>
+                            <div class="select">
+                                <select name="type">
+                                    <option value="ORDER_SEQUENCE">Order Sequence</option>
+                                    <option value="TIME_SEQUENCE">Time Sequence</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="spin-btn-container">
+                        <button class="button is-rounded" onclick="window.controller.onReset()">Revert</button>
+                        <button class="button is-link is-rounded" onclick="window.controller.onSave()">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="edit-cards-container">
+            <div class="card">
+                <div class="card-header">
+                    <p class="card-header-title">
+                        Data Sequences
+                    </p>
+                </div>
+                <div class="card-content">
+                    <div class="hint is-warning">Note: Sequence Interval will be ignored by Order Sequences.</div>
+                    <div class="data-fields-container" id="data-fields-container"></div>
+                    <div class="data-actions">
+                        <button class="button is-primary" onclick="window.controller.appendData()">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <div class="sequence-presentation edit-cards-container">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-header-title">
+                        Data Behavior
+                    </div>
+                </div>
+                <div class="card-content" id="data-digram"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    const defaultConfig = {
+        datas: [],
+        type: '',
+        path: '',
+        option: {
+            sequence: []
+        }
+    }
+
+    const decode = (input) => {
+        const e = document.createElement('div');
+        e.innerHTML = input;
+        return input ? JSON.parse(e.innerText) : { ...defaultConfig };
+    }
+    class Controller {
+        constructor(path, sequenceConfig) {
+            this.path = path;
+            this.sequenceConfig = sequenceConfig;
+
+            this.formData = {
+                ...sequenceConfig,
+                path
+            };
+
+            this.renderDataPresentation(sequenceConfig);
+            this.feedConfigForm();
+        }
+
+        dirty = false;
+
+        createDataNode = (data, index) => {
+            const ele = document.createElement('div');
+            ele.className = 'data-node';
+            ele.innerText = `Data ${index}`;
+            return ele;
+        }
+
+        feedConfigForm() {
+            const inputModels = document.querySelectorAll('input, textarea');
+            inputModels.forEach(entity => {
+                entity.value = this.formData[entity.name];
+                entity.addEventListener('input', () => {
+                    this.onFieldChange(entity.name, entity.value);
+                })
+            });
+
+            const selectModels = document.querySelectorAll('select');
+            selectModels.forEach(entity => {
+                entity.value = this.formData[entity.name];
+                entity.addEventListener('change', () => {
+                    this.onFieldChange(entity.name, entity.value);
+                })
+            });
+
+            this.renderDataFields();
+        }
+
+        appendData() {
+            this.formData.datas.push({});
+            this.formData.option.sequence.push(5000);
+            this.renderDataPresentation();
+            this.renderDataFields();
+        }
+
+        updateData(data, index) {
+            this.formData.datas[index] = data;
+        }
+
+        updateSequence(sequenceInterval, index) {
+            this.formData.option.sequence[index] = sequenceInterval;
+        }
+
+        removeData(index) {
+            this.formData.option.sequence.splice(index, 1);
+            this.formData.datas.splice(index, 1);
+            this.renderDataPresentation();
+            this.renderDataFields();
+        }
+
+        resetInstance() {
+            fetch('/sequence/reset', {
+                method: 'POST',
+                body: JSON.stringify({
+                    path: '{{path}}'
+                }),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }).then(res => {
+                res.status === 201 && alert('Instance reset');
+            })
+        }
+
+        onFieldChange(name, value) {
+
+            if (!this.dirty) {
+                this.dirty = true;
+                window.onbeforeunload = function (e) {
+                    var e = window.event || e;
+                    e.returnValue = ('Current page NOT SAVED yet, are you sure to exit?');
+                }
+            }
+
+            if (this.formData[name] != undefined) {
+                if (name === 'path') {
+                    this.formData[name] = '/api' + value;
+                } else {
+                    this.formData[name] = value;
+                }
+            }
+            this.renderDataPresentation(this.formData);
+        }
+
+        onReset() {
+            if (confirm('Reset This Config?')) {
+                location.reload();
+            }
+        }
+
+        onSave() {
+            fetch('/sequence', {
+                method: 'POST',
+                body: JSON.stringify(this.formData),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(res => {
+                    if (res.status === 201) {
+
+                        window.onbeforeunload = null;
+                        alert('Saved!');
+                        location.href = `/dashboard/edit?path=${this.formData.path}`;
+                    }
+                })
+                .catch(err => {
+                    alert('Something went wrong, see server logs.');
+                })
+        }
+
+        renderDataFields() {
+            const container = document.querySelector('#data-fields-container');
+            Array.from(container.children).forEach(child => child.remove());
+
+            const datas = this.formData.datas;
+
+            const elements = datas.map((data, index) => {
+                const textarea = document.createElement('textarea');
+                textarea.className = 'textarea data-field';
+                textarea.placeholder = 'Put your JSON formatted data here';
+                textarea.innerHTML = JSON.stringify(data, null, 2);
+                rxjs.fromEvent(textarea, 'input')
+                    .pipe(
+                        rxjs.operators.map(inputEvent => inputEvent.srcElement.value),
+                        rxjs.operators.debounceTime(500)
+                    )
+                    .subscribe(d => {
+                        try {
+                            const obj = JSON.parse(d);
+                            this.updateData(obj, index);
+                            textarea.classList.remove('is-danger');
+                        } catch (err) {
+                            textarea.classList.add('is-danger');
+                        }
+                    })
+
+
+                const wrapper = document.createElement('div');
+                wrapper.className = 'field-wrap';
+
+                const label = document.createElement('label');
+                label.className = 'label';
+                label.innerText = `Data ${index}`;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'button is-danger';
+                removeBtn.innerText = 'Remove';
+                removeBtn.onclick = () => {
+                    if (confirm('Remove this data node?')) {
+                        this.removeData(index);
+                    }
+                }
+
+                const sequenceField = document.createElement('input');
+                sequenceField.className = 'input';
+                sequenceField.placeholder = 'Sequence Interval (ms).';
+                sequenceField.value = this.formData.option.sequence[index];
+                sequenceField.type = 'number';
+                sequenceField.oninput = () => {
+                    this.updateSequence(parseInt(sequenceField.value), index);
+                }
+
+                const actionWrap = document.createElement('div');
+                actionWrap.className = 'field-action';
+
+                actionWrap.appendChild(removeBtn);
+                actionWrap.appendChild(sequenceField);
+
+                wrapper.appendChild(label)
+                wrapper.appendChild(actionWrap)
+                wrapper.appendChild(textarea);
+                return wrapper;
+            })
+            elements.forEach(ele => container.appendChild(ele));
+        }
+
+        renderDataPresentation() {
+            const config = this.formData;
+            const container = document.querySelector('#data-digram');
+            Array.from(container.children).forEach(child => child.remove());
+            switch (config.type) {
+                case 'TIME_SEQUENCE': {
+                    this.renderTimeSequence(config.datas, config.option)
+                        .forEach(e => container.appendChild(e));
+                    break;
+                }
+                case 'ORDER_SEQUENCE': {
+                    this.renderOrderSequence(config.datas, config.option)
+                        .forEach(e => container.appendChild(e));
+                }
+            }
+        }
+
+        renderTimeSequence = (datas, option) => {
+            return datas.map((data, index) => {
+                const ele = this.createDataNode(data, index);
+                if (index < datas.length - 1) {
+                    const tail = document.createElement('div');
+                    tail.className = "data-gaping";
+                    tail.innerText = `${option.sequence[index]}ms`;
+                    return [ele, tail];
+                } else {
+                    return [ele];
+                }
+            }).reduce((p, c) => [...p, ...c], []);
+        }
+
+        renderOrderSequence = (datas, option) => {
+            return datas.map((data, index) => {
+                const ele = this.createDataNode(data, index);
+                if (index < datas.length - 1) {
+                    const tail = document.createElement('div');
+                    tail.className = "data-gaping";
+                    tail.innerText = 'Request';
+                    return [ele, tail];
+                } else {
+                    return [ele];
+                }
+            }).reduce((p, c) => [...p, ...c], []);
+        }
+    }
+
+    window.addEventListener('load', () => {
+        window.controller = window.controller || new Controller('{{path}}', decode('{{currentConfig}}'))
+    })
+
+</script>

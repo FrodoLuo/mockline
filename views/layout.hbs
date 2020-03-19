@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/public/styles/bulma.min.css" />
+    <link rel="stylesheet" href="/public/styles/layout.css" />
+    <title>Mock Line Dashboard</title>
+    <script src="https://unpkg.com/@reactivex/rxjs@6.0.0/dist/global/rxjs.umd.js"></script>
+</head>
+
+
+<body>
+    <header>
+        <nav class="navbar is-dark" role="navitation">
+            <div class="navbar-brand">
+                <div class="navbar-item">MockLine</div>
+            </div>
+            <div class="navbar-menu">
+                <div class="navbar-start">
+                    <a href="/dashboard/overview" class="navbar-item is-active-link">
+                        Overview
+                    </a>
+                    <a target="_blank" href="https://github.com/FrodoLuo/mockline/blob/master/README.md" class="navbar-item">
+                        Docs
+                    </a>
+                </div>
+            </div>
+            <div class="navbar-item"><span class="version">Version 0.1.0-alpha</span></div>
+        </nav>
+    </header>
+    <main class="">
+        <nav class="side-content panel">
+            <div class="panel-block">
+                <a href="/dashboard/create" class="button is-link is-outlined is-fullwidth">Add a Sequence</a>
+            </div>
+            {{#each sequenceItems}}
+            <a alt="{{this.uri}}" href="/dashboard/edit?path={{this.uri}}" class="panel-block">{{this.uri}}</a>
+            {{/each}}
+        </nav>
+        <div class="main-content-container-wrap">
+            <div class="main-content-container">
+                <div class="main-content">
+                    {{{ body }}}
+                </div>
+                <footer>
+                    Powered by Nest.js | Handlebars.js | Styled With Bulma
+                    <br />
+                    Author - FrodoLuo | <a target="_blank" href="https://github.com/FrodoLuo/mockline">Github</a>
+                </footer>
+            </div>
+        </div>
+    </main>
+</body>
+<script>
+</script>
+
+</html>
